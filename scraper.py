@@ -1,24 +1,25 @@
-# This is a template for a Python scraper on morph.io (https://morph.io)
-# including some code snippets below that you should find helpful
+import scraperwiki
+import lxml.html
 
-# import scraperwiki
-# import lxml.html
-#
-# # Read in a page
-# html = scraperwiki.scrape("http://foo.com")
-#
-# # Find something on the page using css selectors
-# root = lxml.html.fromstring(html)
-# root.cssselect("div[align='left']")
-#
-# # Write out to the sqlite database using scraperwiki library
-# scraperwiki.sqlite.save(unique_keys=['name'], data={"name": "susan", "occupation": "software developer"})
-#
-# # An arbitrary query against the database
-# scraperwiki.sql.select("* from data where 'name'='peter'")
+ROOT = 'http://www.btt.com.ar/'
+URL_BASE = ROOT + 'bicicleteria/Buenos-Aires.shtml'
 
-# You don't have to do things with the ScraperWiki and lxml libraries.
-# You can use whatever libraries you want: https://morph.io/documentation/python
-# All that matters is that your final data is written to an SQLite database
-# called "data.sqlite" in the current working directory which has at least a table
-# called "data".
+def parseBikeShop(bike_shop_url):
+    html = scraperwiki.scrape(ROOT + bike_shop_url)
+    searchTree = lxml_html.fromstring(html)
+
+    data = dict()
+
+    field_name = searchTree.xpath('//h2/text()')[0].encode('utf-8','ignore').strip(' \t\n\r')
+    data['name'] = field_name
+
+    scraperwiki.sqlite.save(unique_keys=['name'], data=data)
+
+def runScraper(provincia):
+    html = scraperwiki.scrape(URL_BASE + ".shtml")
+    searchTree = lxml_html.fromstring(html)
+
+    for link in searchTree.cssselect('tr a[href^="/bici/"]'):
+        parseBikeShop(link.attrib['href'])
+
+runScraper("Buenos-Aires")
